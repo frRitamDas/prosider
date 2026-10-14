@@ -1,34 +1,45 @@
 export type Game = {
   slug: string;
   title: string;
-  category: "Arcade" | "Puzzle" | "Action" | "Runner";
+  category: "PC" | "Neo Geo" | "Capcom" | "Arcade" | "Flash";
+  genre: string;
   description: string;
   players: string;
-  rating: string;
   accent: string;
   icon: string;
   featured?: boolean;
-  controls: string;
-  objective: string;
+  year?: string;
+  sourcePath: string;
+  engine: string;
+  note?: string;
 };
 
 export const games: Game[] = [
-  { slug: "neon-dash", title: "Neon Dash", category: "Runner", description: "A fast, luminous reflex challenge. Jump the gaps, dodge the hazards, and chase a new high score.", players: "1 player", rating: "4.9", accent: "violet", icon: "⚡", featured: true, controls: "Space / ↑ to jump · P to pause", objective: "Survive for as long as you can and collect the glowing orbs." },
-  { slug: "pixel-blaster", title: "Pixel Blaster", category: "Action", description: "Defend the grid from waves of pixel invaders in this bite-sized arcade shooter.", players: "1 player", rating: "4.8", accent: "blue", icon: "🚀", featured: true, controls: "← → to move · Space to fire", objective: "Destroy incoming targets and avoid letting them reach your ship." },
-  { slug: "block-party", title: "Block Party", category: "Puzzle", description: "Drop, stack, and clear. A familiar block-stacking puzzle with a clean, modern arcade feel.", players: "1 player", rating: "4.7", accent: "pink", icon: "🧩", featured: true, controls: "← → move · ↑ rotate · ↓ drop", objective: "Complete horizontal lines to clear blocks and build your score." },
-  { slug: "orbit-breaker", title: "Orbit Breaker", category: "Arcade", description: "Keep the ball alive, break every target, and find your rhythm.", players: "1 player", rating: "4.6", accent: "orange", icon: "🪐", controls: "Mouse / touch to move the paddle", objective: "Bounce the ball into targets without letting it fall." },
-  { slug: "skyline-sprint", title: "Skyline Sprint", category: "Runner", description: "A little speed, a lot of sky, and one more run to beat your record.", players: "1 player", rating: "4.8", accent: "green", icon: "🏙️", controls: "Space / ↑ to jump", objective: "Jump over obstacles and keep your run going." },
-  { slug: "gem-garden", title: "Gem Garden", category: "Puzzle", description: "Match bright gems, make satisfying combos, and unwind one move at a time.", players: "1 player", rating: "4.5", accent: "pink", icon: "💎", controls: "Tap or click gems", objective: "Match three or more gems to score points." },
-  { slug: "comet-club", title: "Comet Club", category: "Action", description: "Steer through a field of comets and see how long your reflexes can hold.", players: "1 player", rating: "4.7", accent: "blue", icon: "☄️", controls: "Arrow keys to steer", objective: "Avoid the comets and survive as the pace increases." },
-  { slug: "tiny-racers", title: "Tiny Racers", category: "Arcade", description: "A colorful time trial built for quick races and instant rematches.", players: "1 player", rating: "4.6", accent: "orange", icon: "🏎️", controls: "← → steer · ↑ accelerate", objective: "Stay on track and finish before the timer runs out." },
+  { slug: "vice-city", title: "Grand Theft Auto: Vice City", category: "PC", genre: "Open world", description: "Take over the neon streets of 1980s Vice City in a browser-based WebAssembly port.", players: "1 player", accent: "vice", icon: "🌴", featured: true, year: "2002", sourcePath: "/vice-city", engine: "reVC · WebAssembly", note: "Requires a capable desktop browser and WebGL 2." },
+  { slug: "minecraft", title: "Minecraft", category: "PC", genre: "Sandbox", description: "Build, mine and survive in block worlds with the browser-based 1.8.8 community port.", players: "1 player", accent: "craft", icon: "⛏️", featured: true, year: "2011", sourcePath: "/minecraft", engine: "EaglercraftX · WebAssembly" },
+  { slug: "gta3", title: "Grand Theft Auto III", category: "PC", genre: "Open world", description: "Explore Liberty City in the classic open-world action game running through a browser port.", players: "1 player", accent: "city", icon: "🚕", featured: true, year: "2001", sourcePath: "/gta3", engine: "re3 · WebAssembly", note: "Best with keyboard and mouse." },
+  { slug: "simpsons", title: "The Simpsons: Hit & Run", category: "PC", genre: "Action · Racing", description: "Drive around Springfield in a community WebAssembly port of the cult classic.", players: "1 player", accent: "simpsons", icon: "🚙", year: "2003", sourcePath: "/simpsons", engine: "Native WebAssembly", note: "Threaded WebAssembly support may be required." },
+  { slug: "gta-5", title: "Grand Theft Auto V", category: "PC", genre: "Open world", description: "A community WebAssembly/WebGPU port with a large initial asset download.", players: "1 player", accent: "city", icon: "🏙️", year: "2013", sourcePath: "/gta-5", engine: "Community RAGE port", note: "Third-party hosted; desktop Chrome or Edge with WebGPU is recommended." },
+  { slug: "metal-slug", title: "Metal Slug", category: "Neo Geo", genre: "Run & gun", description: "The legendary arcade run-and-gun debut. Fight through enemy lines and rescue prisoners.", players: "1–2 players", accent: "metal", icon: "💥", featured: true, year: "1996", sourcePath: "/retro-games/metal-slug", engine: "FinalBurn Neo" },
+  { slug: "street-fighter-ii-hyper-fighting", title: "Street Fighter II: Hyper Fighting", category: "Capcom", genre: "Fighting", description: "Classic head-to-head arcade combat from the golden age of fighting games.", players: "1–2 players", accent: "fighter", icon: "🥊", year: "1992", sourcePath: "/retro-games/street-fighter-ii-hyper-fighting", engine: "FinalBurn Neo" },
+  { slug: "ultimate-mortal-kombat-3", title: "Ultimate Mortal Kombat 3", category: "Arcade", genre: "Fighting", description: "Fast-paced arcade fighting with a roster of iconic kombatants.", players: "1–2 players", accent: "mortal", icon: "⚔️", year: "1995", sourcePath: "/retro-games/ultimate-mortal-kombat-3", engine: "FinalBurn Neo" },
+  { slug: "pac-man-arcade-1980", title: "Pac-Man", category: "Arcade", genre: "Maze · Action", description: "The arcade icon: clear the maze, collect pellets and stay ahead of the ghosts.", players: "1–2 players", accent: "pacman", icon: "🟡", featured: true, year: "1980", sourcePath: "/retro-games/pac-man-arcade-1980", engine: "FinalBurn Neo" },
+  { slug: "canabalt", title: "Canabalt", category: "Flash", genre: "Endless runner", description: "Leap between rooftops in the minimalist game that helped define the endless runner.", players: "1–2 players", accent: "canabalt", icon: "🏃", featured: true, year: "2009", sourcePath: "/flash-games/canabalt", engine: "Ruffle · Flash" },
+  { slug: "alien-hominid", title: "Alien Hominid", category: "Flash", genre: "Run & gun", description: "A hand-drawn, fast-moving action platformer with a wonderfully chaotic sense of humor.", players: "1 player", accent: "alien", icon: "👽", featured: true, year: "2002", sourcePath: "/flash-games/alien-hominid", engine: "Ruffle · Flash" },
+  { slug: "bloxorz", title: "Bloxorz", category: "Flash", genre: "Puzzle", description: "Roll a block through tricky floating platforms and get it into the square hole.", players: "1 player", accent: "bloxorz", icon: "🧊", year: "2007", sourcePath: "/flash-games/bloxorz", engine: "Ruffle · Flash" },
+  { slug: "happy-wheels", title: "Happy Wheels", category: "Flash", genre: "Physics · Simulation", description: "A physics-based obstacle course classic with community-built levels.", players: "1 player", accent: "wheels", icon: "🚲", year: "2010", sourcePath: "/flash-games/happy-wheels", engine: "Ruffle · Flash" },
+  { slug: "bloons-td-4", title: "Bloons Tower Defense 4", category: "Flash", genre: "Tower defense", description: "Build a defense, upgrade your towers and stop waves of balloons.", players: "1 player", accent: "bloons", icon: "🎈", year: "2009", sourcePath: "/flash-games/bloons-td-4", engine: "Ruffle · Flash" },
+  { slug: "age-of-war", title: "Age of War", category: "Flash", genre: "Strategy", description: "Evolve your army through the ages and outsmart the opposing base.", players: "1 player", accent: "war", icon: "🛡️", year: "2007", sourcePath: "/flash-games/age-of-war", engine: "Ruffle · Flash" },
+  { slug: "helicopter-game", title: "Helicopter Game", category: "Flash", genre: "Arcade", description: "Hold to climb, release to descend and guide your helicopter through the tunnel.", players: "1 player", accent: "heli", icon: "🚁", year: "2004", sourcePath: "/flash-games/helicopter-game", engine: "Ruffle · Flash" }
 ];
 
 export const categories = [
-  { name: "All games", value: "All", icon: "🎮" },
-  { name: "Arcade", value: "Arcade", icon: "🕹️" },
-  { name: "Action", value: "Action", icon: "💥" },
-  { name: "Puzzle", value: "Puzzle", icon: "🧩" },
-  { name: "Runner", value: "Runner", icon: "⚡" },
+  { name: "All games", value: "All", icon: "⌘" },
+  { name: "PC games", value: "PC", icon: "▣" },
+  { name: "Neo Geo", value: "Neo Geo", icon: "◆" },
+  { name: "Capcom", value: "Capcom", icon: "✦" },
+  { name: "Arcade", value: "Arcade", icon: "▦" },
+  { name: "Flash", value: "Flash", icon: "⚡" }
 ] as const;
 
 export function getGame(slug: string) {
