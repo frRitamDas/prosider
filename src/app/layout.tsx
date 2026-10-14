@@ -2,14 +2,14 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: { default: "ProSider — Play something awesome", template: "%s | ProSider" },
-  description: "Jump into quick, colorful browser games on ProSider. No downloads, just play.",
+  title: { default: "ProSider — The Arcade Library", template: "%s | ProSider" },
+  description: "Discover classic PC ports, arcade favourites, Neo Geo fighters and Flash-era games in the ProSider library.",
   applicationName: "ProSider",
-  keywords: ["browser games", "arcade", "puzzle games", "ProSider"],
-  openGraph: { title: "ProSider — Play something awesome", description: "Your next favorite game is one click away.", type: "website" },
+  keywords: ["ProSider", "classic games", "browser games", "arcade", "Flash games", "WebAssembly"],
+  openGraph: { title: "ProSider — The Arcade Library", description: "Classic games. Modern browser.", type: "website" },
 };
 
-export const viewport: Viewport = { themeColor: "#0a0d18", width: "device-width", initialScale: 1 };
+export const viewport: Viewport = { themeColor: "#0c0d10", width: "device-width", initialScale: 1 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return <html lang="en"><body>{children}</body></html>;
