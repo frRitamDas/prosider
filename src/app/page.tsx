@@ -2,41 +2,107 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { ArrowDown, ArrowRight, ArrowUpRight, Gamepad2, Search, Sparkles, Trophy, Zap } from "lucide-react";
+import { ArrowDownRight, ArrowRight, ArrowUpRight, ChevronRight, Gamepad2, Search, SlidersHorizontal, Sparkles, Swords, Monitor, Joystick, Zap } from "lucide-react";
 import { categories, games } from "@/data/games";
 
-type GameCardProps = { game: (typeof games)[number] };
-function GameCard({ game }: GameCardProps) {
-  return <Link href={`/games/${game.slug}`} className="game-card" aria-label={`Play ${game.title}`}>
-    <div className={`game-art art-${game.accent}`}><span className="art-tag">{game.category}</span><span className="art-emoji" aria-hidden="true">{game.icon}</span><span className="play-circle"><ArrowUpRight size={17}/></span></div>
-    <div className="game-info"><div className="game-title-row"><span className="game-title">{game.title}</span><span className="rating">★ {game.rating}</span></div><p className="game-description">{game.description}</p><div className="game-meta"><span className="meta-category"><i className="tag-dot"/> {game.category}</span><span>{game.players}</span></div></div>
-  </Link>;
+function GameCard({ game, featured = false }: { game: (typeof games)[number]; featured?: boolean }) {
+  return (
+    <Link href={`/games/${game.slug}`} className={`library-card ${featured ? "library-card-featured" : ""}`}>
+      <div className={`library-art art-${game.accent}`}>
+        <span className="art-system">{game.category} <span>·</span> {game.engine.split(" · ")[0]}</span>
+        <span className="art-glyph" aria-hidden="true">{game.icon}</span>
+        <span className="art-open"><ArrowUpRight size={17}/></span>
+        <span className="art-grid" />
+      </div>
+      <div className="library-card-copy">
+        <div className="library-title-row"><h3>{game.title}</h3><span className="year-label">{game.year}</span></div>
+        <p>{game.description}</p>
+        <div className="library-card-foot"><span>{game.genre}</span><span>{game.players}</span></div>
+      </div>
+    </Link>
+  );
 }
 
 export default function HomePage() {
   const [activeCategory, setActiveCategory] = useState<string>("All");
   const [query, setQuery] = useState("");
-  const [menuOpen, setMenuOpen] = useState(false);
-  const filteredGames = useMemo(() => games.filter((game) => (activeCategory === "All" || game.category === activeCategory) && `${game.title} ${game.category} ${game.description}`.toLowerCase().includes(query.toLowerCase().trim())), [activeCategory, query]);
-  const featured = games.filter((game) => game.featured);
+  const [showAll, setShowAll] = useState(false);
+  const filteredGames = useMemo(() => games.filter((game) =>
+    (activeCategory === "All" || game.category === activeCategory) &&
+    `${game.title} ${game.category} ${game.genre} ${game.description}`.toLowerCase().includes(query.trim().toLowerCase())
+  ), [activeCategory, query]);
+  const featured = games.filter((game) => game.featured).slice(0, 4);
+  const hasFilters = activeCategory !== "All" || query.trim().length > 0;
+  const visibleGames = showAll || hasFilters ? filteredGames : filteredGames.slice(0, 8);
 
-  return <main><div className="site-shell">
-    <header className="topbar"><Link href="/" className="brand" aria-label="ProSider home"><span className="brand-mark"><Gamepad2 size={22}/></span><span>Pro<em>Sider</em></span></Link>
-      <nav className="navlinks" aria-label="Main navigation"><a className="active" href="#home">Discover</a><a href="#library">Games</a><a href="#categories">Categories</a><a href="#about">About</a></nav>
-      <div className="top-actions"><a href="#library" className="icon-btn" aria-label="Search games"><Search size={18}/></a><a href="#library" className="pill-btn primary">Play now <ArrowUpRight size={15}/></a><button className="menu-btn" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu"><span>{menuOpen ? "×" : "☰"}</span></button></div>
-    </header>
-    {menuOpen && <nav className="mobile-only category-row"><a className="category-chip" href="#home" onClick={() => setMenuOpen(false)}>Discover</a><a className="category-chip" href="#library" onClick={() => setMenuOpen(false)}>Games</a><a className="category-chip" href="#categories" onClick={() => setMenuOpen(false)}>Categories</a></nav>}
+  return (
+    <main className="pro-shell">
+      <aside className="pro-sidebar">
+        <Link href="/" className="pro-brand"><span className="pro-brand-symbol"><Gamepad2 size={20}/></span><span>pro<span className="brand-accent">sider</span><small>THE ARCADE LIBRARY</small></span></Link>
+        <div className="side-label">DISCOVER</div>
+        <nav className="side-nav">
+          <a className="side-nav-item active" href="#discover"><span className="side-nav-icon"><Sparkles size={16}/></span> Discover <span className="nav-active-dot"/></a>
+          <a className="side-nav-item" href="#library"><span className="side-nav-icon"><Gamepad2 size={16}/></span> All games <span className="side-count">{games.length}</span></a>
+          <a className="side-nav-item" href="#systems"><span className="side-nav-icon"><Monitor size={16}/></span> Game systems</a>
+          <a className="side-nav-item" href="#classics"><span className="side-nav-icon"><Joystick size={16}/></span> Retro classics</a>
+        </nav>
+        <div className="side-label side-label-spaced">COLLECTIONS</div>
+        <nav className="side-nav">
+          <button className={`side-nav-item ${activeCategory === "PC" ? "selected" : ""}`} onClick={() => {setActiveCategory("PC");setShowAll(true);document.getElementById("library")?.scrollIntoView({behavior:"smooth"});}}><span className="system-dot pc-dot"/> PC games <span className="side-count">5</span></button>
+          <button className={`side-nav-item ${activeCategory === "Neo Geo" ? "selected" : ""}`} onClick={() => {setActiveCategory("Neo Geo");setShowAll(true);document.getElementById("library")?.scrollIntoView({behavior:"smooth"});}}><span className="system-dot neo-dot"/> Neo Geo</button>
+          <button className={`side-nav-item ${activeCategory === "Capcom" ? "selected" : ""}`} onClick={() => {setActiveCategory("Capcom");setShowAll(true);document.getElementById("library")?.scrollIntoView({behavior:"smooth"});}}><span className="system-dot capcom-dot"/> Capcom arcade</button>
+          <button className={`side-nav-item ${activeCategory === "Arcade" ? "selected" : ""}`} onClick={() => {setActiveCategory("Arcade");setShowAll(true);document.getElementById("library")?.scrollIntoView({behavior:"smooth"});}}><span className="system-dot arcade-dot"/> Arcade classics</button>
+          <button className={`side-nav-item ${activeCategory === "Flash" ? "selected" : ""}`} onClick={() => {setActiveCategory("Flash");setShowAll(true);document.getElementById("library")?.scrollIntoView({behavior:"smooth"});}}><span className="system-dot flash-dot"/> Flash games</button>
+        </nav>
+        <div className="sidebar-bottom"><div className="sidebar-status"><span className="status-pulse"/> LIBRARY ONLINE</div><p>Classic games. Modern browser.</p><span className="sidebar-version">PROSIDER / 01.0</span></div>
+      </aside>
 
-    <section className="hero" id="home"><div><div className="eyebrow"><span className="eyebrow-dot"/> Your next favorite game awaits</div><h1>Less scrolling.<br/><span className="gradient-text">More playing.</span></h1><p>Big arcade energy, tiny time commitment. Discover fun browser games, jump straight in, and make every break a good one.</p><div className="hero-actions"><a className="pill-btn primary" href="#library"><Gamepad2 size={17}/> Explore games <ArrowRight size={16}/></a><a className="secondary-btn" href="#featured">See what’s hot</a></div><div className="stats"><div className="stat"><Trophy size={16}/><span><strong>Instant</strong> play</span></div><div className="stat"><Zap size={16}/><span><strong>Zero</strong> downloads</span></div><div className="stat"><Sparkles size={16}/><span><strong>All fun</strong> vibes</span></div></div></div>
-      <div className="hero-art" aria-label="ProSider featured game artwork"><span className="float-chip chip-one">✦ Pick-up-and-play</span><span className="float-chip chip-two">🎮 Game on</span><div className="hero-orb">🎮</div><span className="float-chip chip-three">⚡ Quick rounds</span><span className="float-chip chip-four">✧ Find your next fave</span></div></section>
+      <div className="pro-main">
+        <header className="pro-topbar">
+          <div className="breadcrumb"><span>Library</span><ChevronRight size={14}/><strong>Discover</strong></div>
+          <div className="topbar-right"><span className="topbar-note"><span className="status-pulse"/> No install required</span><a href="#library" className="topbar-browse">Browse library <ArrowUpRight size={14}/></a></div>
+        </header>
 
-    <section className="section" id="featured"><div className="section-head"><div><div className="section-kicker">Handpicked for you</div><h2>Featured games <span style={{color:"#8ea4ff"}}>✦</span></h2><div className="section-subtitle">The good stuff, right up front.</div></div><a className="text-link" href="#library">Explore all games <ArrowRight size={15}/></a></div><div className="featured-grid">{featured.map((game) => <GameCard key={game.slug} game={game}/>)}</div></section>
+        <section className="discover-hero" id="discover">
+          <div className="hero-copy">
+            <div className="eyebrow-line"><span className="eyebrow-mark"/> YOUR NEXT RUN STARTS HERE</div>
+            <h1>Play the games<br/>you <em>grew up with.</em></h1>
+            <p className="hero-description">From browser legends to arcade icons. A cleaner home for the classics — ready when you are.</p>
+            <div className="hero-buttons"><a href="#library" className="hero-primary">Explore the library <ArrowRight size={16}/></a><a href="#systems" className="hero-secondary">Browse systems <ArrowDownRight size={16}/></a></div>
+            <div className="hero-proof"><span><i/> Browser-based</span><span><i/> Keyboard friendly</span><span><i/> No account</span></div>
+          </div>
+          <div className="hero-showcase" aria-label="Featured games">
+            <div className="showcase-top"><span>EDITOR'S PICKS</span><span className="showcase-index">01 — 04</span></div>
+            <div className="showcase-art"><div className="showcase-ring ring-a"/><div className="showcase-ring ring-b"/><div className="showcase-orb">🕹️</div><span className="showcase-float float-a">8-BIT FOREVER</span><span className="showcase-float float-b">PRESS START <span>↗</span></span><div className="showcase-bottom"><span>THE CLASSICS NEVER LEFT.</span><span>PROSIDER®</span></div></div>
+            <div className="showcase-games">{featured.slice(0,3).map((game,i)=><Link href={`/games/${game.slug}`} key={game.slug} className="showcase-mini"><span className={`mini-icon art-${game.accent}`}>{game.icon}</span><span className="mini-copy"><strong>{game.title}</strong><small>{game.category} / {game.genre}</small></span><ArrowUpRight size={15}/></Link>)}</div>
+          </div>
+        </section>
 
-    <section className="section" id="library"><div className="section-head"><div><div className="section-kicker">The game shelf</div><h2>Find your next obsession</h2><div className="section-subtitle">Pick a vibe. Find a game. Get playing.</div></div></div>
-      <div className="category-row" id="categories">{categories.map((category) => <button key={category.value} className={`category-chip ${activeCategory === category.value ? "selected" : ""}`} onClick={() => setActiveCategory(category.value)}>{category.icon} {category.name}</button>)}</div>
-      <div className="catalogue-tools"><label className="searchbox"><Search size={17}/><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search games, genres, vibes..." aria-label="Search games"/></label><span className="result-count">{filteredGames.length} {filteredGames.length === 1 ? "game" : "games"} to explore</span></div>
-      <div className="catalogue-grid">{filteredGames.length ? filteredGames.map((game) => <GameCard key={game.slug} game={game}/>) : <div className="empty-state"><strong>No games found just yet.</strong>Try another search or switch categories.</div>}</div>
-    </section>
-    <footer className="footer" id="about"><div><div className="footer-brand">ProSider ✦</div><p>Little games. Big main-character energy.</p></div><div className="footer-links"><a href="#home">Back to top ↑</a><a href="#library">Browse games</a><span>Made for play · © {new Date().getFullYear()} ProSider</span></div></footer>
-  </div></main>;
+        <section className="system-strip" id="systems">
+          <div className="system-strip-heading"><span>THE COLLECTION</span><span>01 / 05</span></div>
+          <div className="system-tiles">
+            <button onClick={()=>{setActiveCategory("PC");setShowAll(true);document.getElementById("library")?.scrollIntoView({behavior:"smooth"});}} className="system-tile"><span className="system-tile-icon">▣</span><span><strong>PC ports</strong><small>Open worlds & 3D</small></span><ArrowUpRight size={14}/></button>
+            <button onClick={()=>{setActiveCategory("Neo Geo");setShowAll(true);document.getElementById("library")?.scrollIntoView({behavior:"smooth"});}} className="system-tile"><span className="system-tile-icon neo-icon">◆</span><span><strong>Neo Geo</strong><small>Fighters & run-and-gun</small></span><ArrowUpRight size={14}/></button>
+            <button onClick={()=>{setActiveCategory("Capcom");setShowAll(true);document.getElementById("library")?.scrollIntoView({behavior:"smooth"});}} className="system-tile"><span className="system-tile-icon capcom-icon">✦</span><span><strong>Capcom</strong><small>Arcade legends</small></span><ArrowUpRight size={14}/></button>
+            <button onClick={()=>{setActiveCategory("Arcade");setShowAll(true);document.getElementById("library")?.scrollIntoView({behavior:"smooth"});}} className="system-tile"><span className="system-tile-icon arcade-icon">▦</span><span><strong>Arcade</strong><small>Coin-op classics</small></span><ArrowUpRight size={14}/></button>
+            <button onClick={()=>{setActiveCategory("Flash");setShowAll(true);document.getElementById("library")?.scrollIntoView({behavior:"smooth"});}} className="system-tile"><span className="system-tile-icon flash-icon"><Zap size={18}/></span><span><strong>Flash</strong><small>Browser-era favorites</small></span><ArrowUpRight size={14}/></button>
+          </div>
+        </section>
+
+        <section className="library-section" id="library">
+          <div className="library-section-head"><div><div className="eyebrow-line"><span className="eyebrow-mark"/> FIND YOUR NEXT FAVORITE</div><h2>The game library<span className="heading-count">{filteredGames.length.toString().padStart(2,"0")}</span></h2><p>Real titles from the classic browser and arcade era.</p></div><a href="https://wasmarcade.com/" target="_blank" rel="noreferrer" className="source-link">View full archive <ArrowUpRight size={14}/></a></div>
+          <div className="library-toolbar"><label className="library-search"><Search size={17}/><input value={query} onChange={e=>{setQuery(e.target.value);setShowAll(true);}} placeholder="Search titles, systems, genres..." aria-label="Search the game library"/>{query && <button onClick={()=>setQuery("")} aria-label="Clear search">×</button>}</label><div className="toolbar-right"><span><SlidersHorizontal size={14}/> FILTER</span><button className={activeCategory==="All"?"filter-active":""} onClick={()=>{setActiveCategory("All");setShowAll(true);}}>All systems</button></div></div>
+          <div className="filter-tabs">{categories.map(c=><button key={c.value} onClick={()=>{setActiveCategory(c.value);setShowAll(true);}} className={activeCategory===c.value?"filter-tab active":"filter-tab"}><span>{c.icon}</span>{c.name}</button>)}</div>
+          <div className="library-results-line"><span>{hasFilters ? "FILTERED RESULTS" : "CURATED SELECTION"}</span><span>{visibleGames.length} / {filteredGames.length} TITLES</span></div>
+          <div className="library-grid">{visibleGames.map(game=><GameCard key={game.slug} game={game}/>)}</div>
+          {filteredGames.length===0 && <div className="library-empty"><Gamepad2 size={28}/><strong>No games match that search.</strong><span>Try another title or choose a different system.</span><button onClick={()=>{setQuery("");setActiveCategory("All");setShowAll(true);}}>Reset filters</button></div>}
+          {!showAll && filteredGames.length>8 && <button className="load-more" onClick={()=>setShowAll(true)}>Load more titles <ArrowRight size={16}/></button>}
+          {showAll && filteredGames.length>8 && <button className="load-more" onClick={()=>{setShowAll(false);document.getElementById("library")?.scrollIntoView({behavior:"smooth"});}}>Show fewer titles <ArrowRight size={16}/></button>}
+        </section>
+
+        <section className="archive-note" id="classics"><div className="archive-note-icon"><Swords size={21}/></div><div><strong>Built around the real classics.</strong><p>ProSider catalogues real games from the WASM Arcade library. Game engines and game data remain hosted by their respective providers; availability and requirements can vary by title.</p></div><a href="https://wasmarcade.com/about" target="_blank" rel="noreferrer">How it works <ArrowUpRight size={14}/></a></section>
+        <footer className="pro-footer"><Link href="/" className="footer-wordmark">PROSIDER<span>®</span></Link><span>AN INDEPENDENT GAME LIBRARY</span><span>© {new Date().getFullYear()} PROSIDER</span><a href="https://wasmarcade.com/" target="_blank" rel="noreferrer">Source archive ↗</a></footer>
+      </div>
+    </main>
+  );
 }
