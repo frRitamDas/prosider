@@ -10,7 +10,7 @@ function GameCard({ game, featured = false }: { game: (typeof games)[number]; fe
     <Link href={`/games/${game.slug}`} className={`library-card ${featured ? "library-card-featured" : ""}`}>
       <div className={`library-art art-${game.accent}`}>
         <span className="art-system">{game.category} <span>·</span> {game.engine.split(" · ")[0]}</span>
-        <span className="art-glyph" aria-hidden="true">{game.icon}</span>
+        {game.cover ? <img className="game-cover" src={game.cover} alt="" loading="lazy" /> : <span className="art-glyph" aria-hidden="true">{game.icon}</span>}
         <span className="art-open"><ArrowUpRight size={17}/></span>
         <span className="art-grid" />
       </div>
