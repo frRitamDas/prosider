@@ -1,0 +1,3 @@
+import Link from "next/link";
+import { Gamepad2 } from "lucide-react";
+export default function NotFound(){return <main className="site-shell"><header className="topbar"><Link href="/" className="brand"><span className="brand-mark"><Gamepad2 size={22}/></span><span>Pro<em>Sider</em></span></Link></header><section className="game-not-found"><div style={{fontSize:54}}>🕹️</div><h1>Game not found</h1><p style={{color:"#929bb4"}}>Looks like this game wandered off. There are plenty more to play.</p><Link href="/#library" className="pill-btn primary" style={{marginTop:18}}>Back to the game library ↗</Link></section></main>}
