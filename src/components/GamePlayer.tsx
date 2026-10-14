@@ -17,10 +17,10 @@ export default function GamePlayer({ game }: Props) {
   const entitiesRef = useRef<Entity[]>([]);
   const frameRef = useRef(0);
   const scoreRef = useRef(0);
+  const playerXRef = useRef(0.5);
   const [state, setState] = useState<State>("idle");
   const [score, setScore] = useState(0);
   const [best, setBest] = useState(0);
-  const [muted, setMuted] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -36,7 +36,7 @@ export default function GamePlayer({ game }: Props) {
     setGameState("running");
   }, [game.slug, setGameState]);
 
-  const reset = useCallback(() => { scoreRef.current=0; setScore(0); frameRef.current=0; entitiesRef.current=[]; keysRef.current.clear(); setSaved(false); setGameState("idle"); }, [setGameState]);
+  const reset = useCallback(() => { scoreRef.current=0; setScore(0); frameRef.current=0; entitiesRef.current=[]; playerXRef.current=0.5; keysRef.current.clear(); setSaved(false); setGameState("idle"); }, [setGameState]);
 
   const toggleFullscreen = useCallback(async () => {
     try { if (!document.fullscreenElement) await wrapRef.current?.requestFullscreen(); else await document.exitFullscreen(); } catch { /* Fullscreen may be blocked by browser policy */ }
@@ -81,7 +81,7 @@ export default function GamePlayer({ game }: Props) {
         if(stateRef.current==="running" && frame%10===0){scoreRef.current++;setScore(scoreRef.current);}
         ctx.fillStyle="#dce5ff";ctx.font="600 18px Space Grotesk, sans-serif";ctx.fillText(`SCORE  ${scoreRef.current}`,24,35);
       } else if(game.slug === "pixel-blaster") {
-        const shipX=Math.max(24,Math.min(width-24,width*.5+(keysRef.current.has("ArrowLeft")?-1:0)*frame*2+(keysRef.current.has("ArrowRight")?1:0)*frame*2));
+        if(stateRef.current==="running"){if(keysRef.current.has("ArrowLeft"))playerXRef.current=Math.max(.04,playerXRef.current-.009);if(keysRef.current.has("ArrowRight"))playerXRef.current=Math.min(.96,playerXRef.current+.009);}const shipX=Math.max(24,Math.min(width-24,width*playerXRef.current));
         if(stateRef.current==="running" && frame%55===1) entitiesRef.current.push({x:Math.random()*(width-30)+15,y:-15,w:18,h:18,vx:0,vy:1.6+Math.random(),color:"#ff7da9"});
         if(stateRef.current==="running" && keysRef.current.has(" ") && frame%10===0) entitiesRef.current.push({x:shipX,y:height*.79,w:4,h:14,vx:0,vy:-7,color:accent});
         entitiesRef.current=entitiesRef.current.filter(e=>e.y<height+30&&e.y>-40);
@@ -109,12 +109,12 @@ export default function GamePlayer({ game }: Props) {
       rafRef.current=requestAnimationFrame(draw);
     };
     const saveBest = (value:number) => {try{const current=Number(localStorage.getItem(`prosider-best-${game.slug}`)||0);if(value>current){localStorage.setItem(`prosider-best-${game.slug}`,String(value));setBest(value);setSaved(true);}}catch{/* storage optional */}};
-    const onKeyDown=(event:KeyboardEvent)=>{if(["ArrowLeft","ArrowRight","ArrowUp","ArrowDown"," "].includes(event.key)){event.preventDefault();keysRef.current.add(event.key);}if(event.key.toLowerCase()==="p")setGameState(stateRef.current==="running"?"paused":"running");};
+    const onKeyDown=(event:KeyboardEvent)=>{if(["ArrowLeft","ArrowRight","ArrowUp","ArrowDown"," "].includes(event.key)){event.preventDefault();keysRef.current.add(event.key);if(game.slug==="block-party"&&(event.key==="ArrowLeft"||event.key==="ArrowRight")){const active=entitiesRef.current[entitiesRef.current.length-1];if(active)active.x=Math.max(0,Math.min(9,active.x+(event.key==="ArrowLeft"?-1:1)));}}if(event.key.toLowerCase()==="p")setGameState(stateRef.current==="running"?"paused":"running");};
     const onKeyUp=(event:KeyboardEvent)=>keysRef.current.delete(event.key);
     window.addEventListener("keydown",onKeyDown);window.addEventListener("keyup",onKeyUp);
     rafRef.current=requestAnimationFrame(draw);
     return()=>{observer.disconnect();window.removeEventListener("keydown",onKeyDown);window.removeEventListener("keyup",onKeyUp);if(rafRef.current!==null)cancelAnimationFrame(rafRef.current);};
   }, [game, setGameState]);
 
-  return <div className="player-frame" ref={wrapRef}><div className="player-top"><span>{game.icon} &nbsp; {game.title}</span><span className="live-status"><i/> Browser game · Local play</span></div><div className="player-canvas-wrap"><canvas ref={canvasRef} aria-label={`${game.title} game canvas`}/>{state==="idle"&&<div className="player-overlay"><div className="overlay-icon">{game.icon}</div><h2>Ready, player one?</h2><p>{game.objective}</p><button className="pill-btn primary start-btn" onClick={start}><Play size={15} fill="currentColor"/> Start playing</button></div>}{state==="over"&&<div className="player-overlay"><div className="overlay-icon">✨</div><h2>Nice run!</h2><p>You scored {score} points. Your best score is {Math.max(best,score)}.</p><button className="pill-btn primary start-btn" onClick={start}><RotateCcw size={15}/> Play again</button></div>}</div><div className="player-controls"><button className="control-btn primary" onClick={()=>state==="running"?setGameState("paused"):state==="paused"?setGameState("running"):start()}>{state==="running"?<Pause size={14}/>:<Play size={14}/>} {state==="running"?"Pause":state==="paused"?"Resume":"Play"}</button><button className="control-btn" onClick={reset}><RotateCcw size={14}/> Restart</button><button className="control-btn" onClick={toggleFullscreen}><Maximize2 size={14}/> {isFullscreen?"Exit fullscreen":"Fullscreen"}</button><button className="control-btn" onClick={()=>setMuted(!muted)}>{muted?<VolumeX size={14}/>:<Volume2 size={14}/>} {muted?"Sound off":"Sound on"}</button><span className="player-hint">SCORE {score} · BEST {Math.max(best,score)}</span></div></div>;
+  return <div className="player-frame" ref={wrapRef}><div className="player-top"><span>{game.icon} &nbsp; {game.title}</span><span className="live-status"><i/> Browser game · Local play</span></div><div className="player-canvas-wrap"><canvas ref={canvasRef} aria-label={`${game.title} game canvas`}/>{state==="idle"&&<div className="player-overlay"><div className="overlay-icon">{game.icon}</div><h2>Ready, player one?</h2><p>{game.objective}</p><button className="pill-btn primary start-btn" onClick={start}><Play size={15} fill="currentColor"/> Start playing</button></div>}{state==="over"&&<div className="player-overlay"><div className="overlay-icon">✨</div><h2>Nice run!</h2><p>You scored {score} points. Your best score is {Math.max(best,score)}.</p><button className="pill-btn primary start-btn" onClick={start}><RotateCcw size={15}/> Play again</button></div>}</div><div className="touch-controls" aria-label="Touch game controls"><button className="control-btn" onPointerDown={(e)=>{e.preventDefault();keysRef.current.add("ArrowLeft");}} onPointerUp={()=>keysRef.current.delete("ArrowLeft")} onPointerCancel={()=>keysRef.current.delete("ArrowLeft")} onPointerLeave={()=>keysRef.current.delete("ArrowLeft")}>←</button><button className="control-btn" onPointerDown={(e)=>{e.preventDefault();keysRef.current.add("ArrowRight");}} onPointerUp={()=>keysRef.current.delete("ArrowRight")} onPointerCancel={()=>keysRef.current.delete("ArrowRight")} onPointerLeave={()=>keysRef.current.delete("ArrowRight")}>→</button><button className="control-btn primary" onPointerDown={(e)=>{e.preventDefault();keysRef.current.add(game.slug==="pixel-blaster"?" ":"ArrowUp");}} onPointerUp={()=>{keysRef.current.delete(" ");keysRef.current.delete("ArrowUp");}} onPointerCancel={()=>{keysRef.current.delete(" ");keysRef.current.delete("ArrowUp");}} onPointerLeave={()=>{keysRef.current.delete(" ");keysRef.current.delete("ArrowUp");}}>{game.slug==="pixel-blaster"?"FIRE":"JUMP / ACTION"}</button></div><div className="player-controls"><button className="control-btn primary" onClick={()=>state==="running"?setGameState("paused"):state==="paused"?setGameState("running"):start()}>{state==="running"?<Pause size={14}/>:<Play size={14}/>} {state==="running"?"Pause":state==="paused"?"Resume":"Play"}</button><button className="control-btn" onClick={reset}><RotateCcw size={14}/> Restart</button><button className="control-btn" onClick={toggleFullscreen}><Maximize2 size={14}/> {isFullscreen?"Exit fullscreen":"Fullscreen"}</button><span className="player-hint">SCORE {score} · BEST {Math.max(best,score)}</span></div></div>;
 }
