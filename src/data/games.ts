@@ -12,6 +12,8 @@ export type Game = {
   sourcePath: string;
   engine: string;
   note?: string;
+  controls?: string;
+  objective?: string;
 };
 
 export const games: Game[] = [
